@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Classification Complete!</h2>
+<p>Your database has been processed and split into structured output CSVs stored in your <code>uploads/</code> directory:</p>
+
+<ul class="badge-list">
+    <li class="badge">📁 BusinessEmails.csv</li>
+    <li class="badge">👤 IndividualEmails.csv</li>
+</ul>
+
+<a href="/upload" class="btn">Upload Another CSV</a>
+{% endblock %}
