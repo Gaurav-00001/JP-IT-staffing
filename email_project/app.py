@@ -10,7 +10,7 @@ from emailClassifier import chunk_list, classify_email_batch
 
 app = Flask(__name__)
 
-# Fetch Flask secret key safely from environment variables
+# Read secret key safely
 app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")
 
 UPLOAD_FOLDER = "uploads"
@@ -41,7 +41,7 @@ def dashboard():
     )
 
 # ---------------------------------------------------------
-# Upload CSV Route (Part 1)
+# Upload CSV Route
 # ---------------------------------------------------------
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
@@ -53,7 +53,7 @@ def upload():
 
             # Process CSV
             df = pd.read_csv(filepath)
-            email_column = df.columns[0]  # Assumes emails are in the 1st column
+            email_column = df.columns[0]
             emails = df[email_column].dropna().tolist()
 
             classified_results = {}
@@ -75,14 +75,14 @@ def upload():
     return render_template("upload.html")
 
 # ---------------------------------------------------------
-# Classification Results Route (Part 1)
+# Classification Results Route
 # ---------------------------------------------------------
 @app.route("/classify")
 def classify():
     return render_template("classify.html")
 
 # ---------------------------------------------------------
-# Search / Lead Generator Route (Part 2)
+# Search / Lead Generator Route
 # ---------------------------------------------------------
 @app.route("/search_leads", methods=["POST"])
 def search_leads():
@@ -95,7 +95,7 @@ def search_leads():
     return redirect(url_for("dashboard"))
 
 # ---------------------------------------------------------
-# Catalog PDF Upload Route (Part 2)
+# Catalog PDF Upload Route
 # ---------------------------------------------------------
 @app.route("/upload_pdf", methods=["POST"])
 def upload_pdf():
@@ -109,14 +109,14 @@ def upload_pdf():
     return redirect(url_for("dashboard"))
 
 # ---------------------------------------------------------
-# Email Dispatcher Route (Part 2)
+# Email Dispatcher Route
 # ---------------------------------------------------------
 @app.route("/send_emails", methods=["POST"])
 def send_emails():
     subject = request.form.get("email_subject")
     html_template = request.form.get("html_template")
 
-    # Read credentials securely from environment variables
+    # Fetch email credentials safely from environment variables
     sender_email = os.getenv("SENDER_EMAIL")
     sender_password = os.getenv("SENDER_PASSWORD")
 
