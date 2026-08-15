@@ -1,7 +1,10 @@
-import google.generativeai as genai
+import os
 import json
+import google.generativeai as genai
 
-genai.configure(api_key="YOUR_GEMINI_API_KEY")
+# Read key safely from environment variables
+api_key = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=api_key)
 
 def chunk_list(lst, size):
     """Splits a list into smaller batches."""
@@ -31,9 +34,9 @@ def classify_email_batch(emails):
     """
     
     model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content(prompt)
     
     try:
+        response = model.generate_content(prompt)
         return json.loads(response.text.strip())
     except Exception:
         return {email: "INDIVIDUAL" for email in emails}
