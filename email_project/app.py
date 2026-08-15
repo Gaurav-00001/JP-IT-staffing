@@ -9,7 +9,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from emailClassifier import chunk_list, classify_email_batch
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"
+
+# Fetch Flask secret key safely from environment variables
+app.secret_key = os.getenv("SECRET_KEY", "fallback_secret_key")
 
 UPLOAD_FOLDER = "uploads"
 PDF_FOLDER = "static/pdf"
@@ -61,7 +63,6 @@ def upload():
 
             # Split outputs into Business and Individual
             df["Category"] = df[email_column].map(classified_results)
-            
             business_df = df[df["Category"] == "BUSINESS"]
             individual_df = df[df["Category"] == "INDIVIDUAL"]
 
@@ -70,7 +71,7 @@ def upload():
 
             flash("Database uploaded and classified successfully!", "success")
             return redirect(url_for("classify"))
-    
+
     return render_template("upload.html")
 
 # ---------------------------------------------------------
@@ -114,8 +115,14 @@ def upload_pdf():
 def send_emails():
     subject = request.form.get("email_subject")
     html_template = request.form.get("html_template")
-    sender_email = "your_email@gmail.com"
-    sender_password = "your_app_password"
+
+    # Read credentials securely from environment variables
+    sender_email = os.getenv("SENDER_EMAIL")
+    sender_password = os.getenv("SENDER_PASSWORD")
+
+    if not sender_email or not sender_password:
+        flash("Sender email credentials are not set in environment variables.", "danger")
+        return redirect(url_for("dashboard"))
 
     csv_path = os.path.join(UPLOAD_FOLDER, "IndividualEmails.csv")
     if not os.path.exists(csv_path):
@@ -148,7 +155,6 @@ def send_emails():
 
         server.quit()
         flash("Bulk email campaign executed successfully!", "success")
-
     except Exception as e:
         flash(f"Failed to send emails: {str(e)}", "danger")
 
